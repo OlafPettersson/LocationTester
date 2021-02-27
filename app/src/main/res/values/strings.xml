@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Location Tester</string>
+    <string name="tab_text_1">Monitor</string>
+    <string name="tab_text_2">Map</string>
+    <string name="tab_text_3">Select</string>
+    <string name="tab_text_4">Details</string>
+    <string name="enable">Enable</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings">Settings</string>
+</resources>

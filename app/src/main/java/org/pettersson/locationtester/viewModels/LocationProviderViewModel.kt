@@ -1,7 +1,6 @@
 package org.pettersson.locationtester.viewModels
 
 import android.app.Activity
-import android.graphics.Color
 import android.location.Location
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +8,8 @@ import androidx.lifecycle.map
 import org.pettersson.location.LocationFormatter
 import org.pettersson.locationtester.helper.RecyclerItem
 import org.pettersson.locationtester.helper.format
+import kotlin.math.log10
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
@@ -20,7 +21,8 @@ abstract class LocationProviderViewModel(val name : String, val id: String) {
     val timeValue= MutableLiveData<Long?>()
 
     val location = MutableLiveData<String>()
-    val accuracy = MutableLiveData<String>()
+    val accuracyAsMeters = MutableLiveData<String>()
+    val accuracyValue   = MutableLiveData<Int?>()
     val time     = MutableLiveData<String>()
 
     val displayColor = MutableLiveData<Int>()
@@ -50,15 +52,19 @@ abstract class LocationProviderViewModel(val name : String, val id: String) {
         if(newLocation == null){
             locationValue.postValue(null)
             location.postValue("")
-            accuracy.postValue("")
+            accuracyAsMeters.postValue("")
+            accuracyValue.postValue(null)
             timeValue.postValue(null)
         }
         else {
             locationValue.postValue(newLocation)
             location.postValue(
-                LocationFormatter.longitudeAsDMS(newLocation.longitude, 2)
-                      + " " + LocationFormatter.latitudeAsDMS(newLocation.latitude, 2))
-            accuracy.postValue("${newLocation.accuracy.format(0)} m")
+                    LocationFormatter.latitudeAsDMS(newLocation.latitude, 3)
+                 + " " +  LocationFormatter.longitudeAsDMS(newLocation.longitude, 3)
+                      )
+            accuracyAsMeters.postValue("${newLocation.accuracy?.format(0)} m")
+            accuracyValue.postValue(if (newLocation.accuracy == null)  null
+                                    else log10(newLocation.accuracy.toDouble()).roundToInt())
             timeValue.postValue(newLocation.time)
         }
 

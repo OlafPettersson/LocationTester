@@ -2,7 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
         <variable
             name="viewModel"
             type="org.pettersson.locationtester.viewModels.LocationProviderViewModel" />
@@ -62,16 +61,26 @@
                 android:id="@+id/right1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.location}"
-                android:textStyle="bold"
+                android:text="@{viewModel.accuracyAsMeters}"
                 android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@+id/settings"
                 />
+
+            <ImageView
+                android:id="@+id/right1_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@{viewModel.accuracyValue == null ? null : viewModel.accuracyValue == 0 ? @drawable/ic_precision_0 : viewModel.accuracyValue == 1 ? @drawable/ic_precision_1 : viewModel.accuracyValue == 2 ? @drawable/ic_precision_2 : viewModel.accuracyValue == 3 ? @drawable/ic_precision_3 : viewModel.accuracyValue == 4 ? @drawable/ic_precision_4 : @drawable/ic_precision_5}"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/right1"
+                />
+
             <TextView
                 android:id="@+id/right2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.accuracy}"
+                android:textStyle="bold"
+                android:text="@{viewModel.location}"
                 android:layout_below="@id/right1"
                 android:layout_toLeftOf="@+id/settings"
                 />

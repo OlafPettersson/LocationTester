@@ -146,6 +146,7 @@ class MapFragment : Fragment() {
 
         val map = root.findViewById<MapView>(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
+
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
         map.setMultiTouchControls(true)
         map.isTilesScaledToDpi = true // on high DPI devices (i.e. most modern ones)

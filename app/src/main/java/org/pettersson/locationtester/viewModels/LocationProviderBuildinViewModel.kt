@@ -36,7 +36,7 @@ class LocationProviderBuildinViewModel(name : String,
         }
 
         _provider.enableListening(isEnabled)
-        updateState();
+        updateState()
     }
 
     override fun requeryLocation() {
@@ -48,8 +48,13 @@ class LocationProviderBuildinViewModel(name : String,
         if(!isEnabled){
             return LocationProviderState.OFF
         }
+
+        if(_provider.providerFailure == true){
+            return LocationProviderState.NOT_INSTALLED
+        }
+
         if(!_provider.checkPermission()){
-            return LocationProviderState.NO_PERMISSION;
+            return LocationProviderState.NO_PERMISSION
         }
 
         _provider.updateListeningState()
@@ -85,7 +90,7 @@ class LocationProviderBuildinViewModel(name : String,
             return false
 
         if(_provider.isEnabled())
-            return true;
+            return true
 
         if(requestActivity == null)
             return false

@@ -37,6 +37,7 @@ available at [F-Droid](https://f-droid.org/en/packages/com.google.android.gms/).
 
 | State              | Meaning                                                  |
 | ------------------ | -------------------------------------------------------- | 
+| NOT_INSTALLED      | Buildin: The Location Provider appears to be not installed on this system  
 | NO_PERMISSION      | Location permissions have not been granted to us. Click on the row to request the permissions.
 | DISABLED           | Locations are disabled in android settings. Click on the row to go to the settings.
 | BINDING            | UnifiedNlp: we are trying to bind to service.               |

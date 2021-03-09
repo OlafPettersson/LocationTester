@@ -6,14 +6,17 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 
 class LocationProviderBuildin(val context : Context, val provider : String){
 
-    private var mListeningUsageCount : Int = 0;
-    private var mIsRegistered : Boolean = false;
+    private var mListeningUsageCount : Int = 0
+    private var mIsRegistered : Boolean = false
 
-    private val mLocationManager : LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+    var providerFailure : Boolean? = null
+
+    private val mLocationManager : LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     val location        = MutableLiveData<Location>()
     val queriedLocation = MutableLiveData<Location?>()
@@ -38,29 +41,37 @@ class LocationProviderBuildin(val context : Context, val provider : String){
     @Synchronized
     fun enableListening(enable : Boolean ){
         if(enable)
-            mListeningUsageCount += 1;
+            mListeningUsageCount += 1
         else
-            mListeningUsageCount -= 1;
+            mListeningUsageCount -= 1
 
         updateListeningState()
     }
 
     @Synchronized
     fun updateListeningState() {
-        if (mListeningUsageCount > 0 && !mIsRegistered) {
-            try {
+        try {
+            if (mListeningUsageCount > 0 && !mIsRegistered) {
+
                 queriedLocation.value = mLocationManager.getLastKnownLocation(provider)
                 mLocationManager.requestLocationUpdates(provider, 0L, 0f, mLocationListener)
                 mIsRegistered = true
             }
-            catch(e: SecurityException){
-                // no error, we just tried.
+
+            if (mListeningUsageCount <= 0 && mIsRegistered) {
+                mLocationManager.removeUpdates(mLocationListener)
+                mIsRegistered = false
             }
         }
-
-        if (mListeningUsageCount <= 0 && mIsRegistered) {
-            mLocationManager.removeUpdates(mLocationListener)
-            mIsRegistered = false
+        catch(e: SecurityException){
+            // no error, we just tried.
+        }
+        catch(e: IllegalArgumentException){
+            // no error, we just tried (i.e. provider does not exist)
+            providerFailure = true
+        }
+        catch(e: Exception) {
+            Log.w("locations failed", e)
         }
     }
 
@@ -71,12 +82,33 @@ class LocationProviderBuildin(val context : Context, val provider : String){
         catch(e: SecurityException){
             // no error, we just tried.
         }
-    }
-    public fun isEnabled() : Boolean{
-        return mLocationManager.isLocationEnabled && mLocationManager.isProviderEnabled(provider);
+        catch(e: IllegalArgumentException){
+            providerFailure = true
+        }
+        catch(e: Exception){
+            // no error, we just tried (i.e. provider does not exist)
+        }
     }
 
-    public fun checkPermission(requestGrantActivity : Activity? = null,
+    fun isEnabled() : Boolean{
+        if(android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P){
+            if(!mLocationManager.isLocationEnabled){
+                return false
+            }
+        }
+        try{
+            return mLocationManager.isProviderEnabled(provider)
+        }
+        catch(e: SecurityException){
+        }
+        catch(e: java.lang.IllegalArgumentException){
+            providerFailure = true
+        }
+
+        return false
+    }
+
+    fun checkPermission(requestGrantActivity : Activity? = null,
                                requestResultCode : Int = 0): Boolean {
         val permission = if (provider == LocationManager.NETWORK_PROVIDER)
                               LocationPermissions.ACCESS_COARSE_LOCATION
